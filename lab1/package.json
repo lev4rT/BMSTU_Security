@@ -8,7 +8,7 @@
     "build-installer": "pkg installer.js --output ./dist/installer.exe -c package.json",
     "build-program": "pkg program.js --output ./dist/program.exe -c package.json",
     "install": "./dist/installer.exe",
-    "program": "./dist/programm.exe"
+    "program": "./dist/program.exe"
   },
   "keywords": [],
   "author": "",
@@ -23,7 +23,7 @@
       "./node_modules/terminal-parrot/frames"
     ],
     "targets": [
-      "node14-linux-x64"
+      "node14-macos-arm64"
     ]
   }
 }
