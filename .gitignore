@@ -105,5 +105,7 @@ dist
 
 # Other
 package-lock.json
-dist
 .idea
+cmake-build-debug
+test.txt
+config.txt
