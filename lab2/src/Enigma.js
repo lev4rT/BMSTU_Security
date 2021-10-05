@@ -13,30 +13,28 @@ class Enigma {
     constructor(configFileName) {
 
         let data = JSON.parse(fs.readFileSync(configFileName).toString());
-        this.#firstRotor = new Rotor(data.firstRotorWheel, data.firstRotorCurrentChar, data.firstRotorCharToSpin);
-        this.#secondRotor = new Rotor(data.secondRotorWheel, data.secondRotorCurrentChar, data.secondRotorCharToSpin);
-        this.#thirdRotor = new Rotor(data.thirdRotorWheel, data.thirdRotorCurrentChar, data.thirdRotorCharToSpin);
+        this.#firstRotor = new Rotor(data.firstRotorWheel, data.firstRotorCurrentSymbol, data.firstRotorSymbolToSpin);
+        this.#secondRotor = new Rotor(data.secondRotorWheel, data.secondRotorCurrentSymbol, data.secondRotorSymbolToSpin);
+        this.#thirdRotor = new Rotor(data.thirdRotorWheel, data.thirdRotorCurrentSymbol, data.thirdRotorSymbolToSpin);
         this.#reflector = new Reflector(data.reflector);
     }
 
     encode(value) {
-        let encodedValue = '';
-        for (let char of value) {
+        let encodedValue = [];
+        for (let symbol of value) {
             this.#firstRotor.spin() && this.#secondRotor.spin() && this.#thirdRotor.spin();
-            let firstRotorStraightResult = this.#firstRotor.wheel[String.fromCharCode(addModulo(char.charCodeAt(0) - 'A'.charCodeAt(0), this.#firstRotor.currentSymbol) + 'A'.charCodeAt(0))];
-            let secondRotorStraightResult = this.#secondRotor.wheel[String.fromCharCode(addModulo(firstRotorStraightResult.charCodeAt(0) - 'A'.charCodeAt(0), diffModulo(this.#secondRotor.currentSymbol, this.#firstRotor.currentSymbol)) + 'A'.charCodeAt(0))];
-            // console.log(addModulo(firstRotorStraightResult.charCodeAt(0) - 'A'.charCodeAt(0), diffModulo(this.#secondRotor.currentSymbol, this.#firstRotor.currentSymbol)));
-            // console.log(String.fromCharCode(addModulo(firstRotorStraightResult.charCodeAt(0) - 'A'.charCodeAt(0), diffModulo(this.#secondRotor.currentSymbol, this.#firstRotor.currentSymbol)) + 'A'.charCodeAt(0)));
-            let thirdRotorStraightResult = this.#thirdRotor.wheel[String.fromCharCode(addModulo(secondRotorStraightResult.charCodeAt(0) - 'A'.charCodeAt(0), diffModulo(this.#thirdRotor.currentSymbol, this.#secondRotor.currentSymbol)) + 'A'.charCodeAt(0))];
-            let reflectorResult = this.#reflector.get(String.fromCharCode(diffModulo(thirdRotorStraightResult.charCodeAt(0) - 'A'.charCodeAt(0), this.#thirdRotor.currentSymbol) + 'A'.charCodeAt(0)))
+            let firstRotorStraightResult = this.#firstRotor.wheel[addModulo(symbol, this.#firstRotor.currentSymbol)];
+            let secondRotorStraightResult = this.#secondRotor.wheel[addModulo(firstRotorStraightResult, diffModulo(this.#secondRotor.currentSymbol, this.#firstRotor.currentSymbol))];
+            let thirdRotorStraightResult = this.#thirdRotor.wheel[addModulo(secondRotorStraightResult, diffModulo(this.#thirdRotor.currentSymbol, this.#secondRotor.currentSymbol))];
+            let reflectorResult = this.#reflector.get(diffModulo(thirdRotorStraightResult, this.#thirdRotor.currentSymbol));
 
-            let thirdRotorReverseResult = this.#thirdRotor.getSymbolReversed(String.fromCharCode(addModulo(reflectorResult.charCodeAt(0) - 'A'.charCodeAt(0), this.#thirdRotor.currentSymbol) + 'A'.charCodeAt(0)));
-            let secondRotorReverseResult = this.#secondRotor.getSymbolReversed(String.fromCharCode(diffModulo(thirdRotorReverseResult.charCodeAt(0) - 'A'.charCodeAt(0), diffModulo(this.#thirdRotor.currentSymbol, this.#secondRotor.currentSymbol)) + 'A'.charCodeAt(0)));
-            let firstRotorReverseResult = this.#firstRotor.getSymbolReversed(String.fromCharCode(diffModulo(secondRotorReverseResult.charCodeAt(0) - 'A'.charCodeAt(0), diffModulo(this.#secondRotor.currentSymbol, this.#firstRotor.currentSymbol)) + 'A'.charCodeAt(0)));
-            let result = String.fromCharCode(diffModulo(firstRotorReverseResult.charCodeAt(0) - 'A'.charCodeAt(0), this.#firstRotor.currentSymbol) + 'A'.charCodeAt(0));
-            encodedValue += result;
+            let thirdRotorReverseResult = this.#thirdRotor.getSymbolReversed(addModulo(reflectorResult, this.#thirdRotor.currentSymbol));
+            let secondRotorReverseResult = this.#secondRotor.getSymbolReversed(diffModulo(thirdRotorReverseResult, diffModulo(this.#thirdRotor.currentSymbol, this.#secondRotor.currentSymbol)));
+            let firstRotorReverseResult = this.#firstRotor.getSymbolReversed(diffModulo(secondRotorReverseResult, diffModulo(this.#secondRotor.currentSymbol, this.#firstRotor.currentSymbol)));
+            let result = diffModulo(firstRotorReverseResult, this.#firstRotor.currentSymbol);
+            encodedValue.push(result);
         }
-        console.log(encodedValue)
+        return encodedValue;
     }
 }
 

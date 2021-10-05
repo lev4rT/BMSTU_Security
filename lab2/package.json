@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ./src/index.js"
+    "create-config": "node ./src/config/createConfig.js"
   },
   "keywords": [],
   "author": "",

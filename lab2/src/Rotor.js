@@ -1,12 +1,12 @@
 class Rotor {
     #wheel
-    #currentChar
-    #charToSpin
+    #currentSymbol
+    #symbolToSpin
 
     constructor(wheel, currentChar, charToSpin) {
         this.#wheel = wheel;
-        this.#currentChar = currentChar;
-        this.#charToSpin = charToSpin;
+        this.#currentSymbol = currentChar;
+        this.#symbolToSpin = charToSpin;
     }
 
     get wheel() {
@@ -14,20 +14,20 @@ class Rotor {
     }
 
     get currentSymbol() {
-        return this.#currentChar.charCodeAt(0) - 'A'.charCodeAt(0);
+        return this.#currentSymbol;
     }
 
     /**
      * @returns {boolean} - the need to rotate the next rotor
      */
     spin() {
-        this.#currentChar = this.#currentChar !== 'Z' ? String.fromCharCode(this.#currentChar.charCodeAt(0) + 1) : 'A';
-        return this.#currentChar === this.#charToSpin
+        this.#currentSymbol = this.#currentSymbol !== global.amountOfSymbols - 1 ? this.#currentSymbol + 1 : 0;
+        return this.#currentSymbol === this.#symbolToSpin
     }
 
     getSymbolReversed(symbol) {
         for (let key in this.#wheel) {
-            if (this.#wheel[key] === symbol) {
+            if (this.#wheel[key] == symbol) {
                 return key;
             }
         }
